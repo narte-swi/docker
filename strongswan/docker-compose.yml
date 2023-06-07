@@ -1,4 +1,4 @@
-version: "3"
+version: "3.7"
 
 services:
   vpn-server:
@@ -14,13 +14,14 @@ services:
       - ./server:/etc/swanctl
       - ./strongswan.conf:/etc/strongswan.conf
     networks:
-      internet:
+      internet1:
          ipv4_address: 192.168.0.2
       intranet:
          ipv4_address: 10.1.0.2
-  vpn-client:
+
+  vpn-client1:
     image: strongx509/strongswan:latest
-    container_name: vpn-client
+    container_name: vpn-client1
     depends_on:
       - vpn-server
     cap_add:
@@ -33,15 +34,38 @@ services:
       - ./client:/etc/swanctl
       - ./strongswan.conf:/etc/strongswan.conf
     networks:
-      internet:
-         ipv4_address: 192.168.0.3
+      internet1:
+         #ipv4_address: 192.168.0.3
+
+  vpn-client2:
+    image: strongx509/strongswan:latest
+    container_name: vpn-client2
+    depends_on:
+      - vpn-server
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_MODULE
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./client:/etc/swanctl
+      - ./strongswan.conf:/etc/strongswan.conf
+    networks:
+      internet2:
+         #ipv4_address: 192.168.0.3
 
 networks:
-  internet:
+  internet1:
     ipam:
       driver: default 
       config:
         - subnet: 192.168.0.0/24
+  internet2:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
   intranet:
      ipam:
         driver: default
